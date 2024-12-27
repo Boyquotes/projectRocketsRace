@@ -4,21 +4,42 @@ import { useQuery } from '@apollo/client';
 import { GET_ROCKETS } from '@/graphql/queries';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 
 export default function RocketsPage() {
   const { loading, error, data } = useQuery(GET_ROCKETS);
   const [selectedRockets, setSelectedRockets] = useState<string[]>([]);
+  const [socket, setSocket] = useState<any>(null);
 
   useEffect(() => {
-    // Load previously selected rockets from local storage on component mount
+    // Create socket connection
+    const newSocket = io('http://localhost:3001', { 
+      transports: ['websocket'],
+      reconnection: true 
+    });
+    setSocket(newSocket);
+
+    // Listen for synchronized rocket selections
+    newSocket.on('rocket-selection', (selectedRocketIds: string[]) => {
+      setSelectedRockets(selectedRocketIds);
+      localStorage.setItem('selectedRockets', JSON.stringify(selectedRocketIds));
+    });
+
+    // Load previously selected rockets from local storage
     const storedRockets = localStorage.getItem('selectedRockets');
     if (storedRockets) {
-      setSelectedRockets(JSON.parse(storedRockets));
+      const parsedRockets = JSON.parse(storedRockets);
+      setSelectedRockets(parsedRockets);
+      newSocket.emit('sync-rocket-selection', parsedRockets);
     }
+
+    // Cleanup socket on unmount
+    return () => {
+      newSocket.disconnect();
+    };
   }, []);
 
   const handleRocketSelect = (rocketId: string) => {
-    // Create a copy of current selected rockets
     let newSelectedRockets = [...selectedRockets];
 
     // If rocket is already selected, remove it
@@ -35,15 +56,16 @@ export default function RocketsPage() {
       }
     }
 
-    // Update state and local storage
+    // Update state, local storage, and broadcast to other tabs
     setSelectedRockets(newSelectedRockets);
     localStorage.setItem('selectedRockets', JSON.stringify(newSelectedRockets));
+    socket?.emit('rocket-selection', newSelectedRockets);
   };
 
   const handleLaunchRace = () => {
     // Placeholder for race launch logic
     console.log('Launching race with rockets:', selectedRockets);
-    // You can add more complex logic here later
+    socket?.emit('launch-race', selectedRockets);
   };
 
   if (loading) return <p>Loading rockets...</p>;
