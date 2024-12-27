@@ -90,31 +90,61 @@ export default function RocketsPage() {
         ))}
       </div>
       
-      <div className="flex justify-center mt-6">
-        <button 
-          onClick={handleLaunchRace}
-          disabled={selectedRockets.length !== 2}
-          className={`
-            flex items-center
-            font-bold 
-            py-3 px-6 
-            rounded-full 
-            shadow-lg 
-            transform 
-            transition-all 
-            duration-300 
-            focus:outline-none 
-            focus:ring-2 
-            focus:ring-opacity-50
-            ${selectedRockets.length === 2 
-              ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 active:scale-95 hover:shadow-xl focus:ring-blue-500' 
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'}
-          `}
+      <div className="flex justify-center mt-6 relative">
+        <div 
+          className="group"
+          data-tooltip="Choose two rockets before take off"
         >
-          <span className="flex items-center">
-            🚀 Launch the Race 🏁
-          </span>
-        </button>
+          <button 
+            onClick={handleLaunchRace}
+            disabled={selectedRockets.length !== 2}
+            className={`
+              flex items-center
+              font-bold 
+              py-3 px-6 
+              rounded-full 
+              shadow-lg 
+              transform 
+              transition-all 
+              duration-300 
+              focus:outline-none 
+              focus:ring-2 
+              focus:ring-opacity-50
+              ${selectedRockets.length === 2 
+                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 active:scale-95 hover:shadow-xl focus:ring-blue-500' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'}
+            `}
+          >
+            <span className="flex items-center">
+              🚀 Launch the Race 🏁
+            </span>
+          </button>
+          {selectedRockets.length !== 2 && (
+            <div 
+              className="
+                absolute 
+                top-full 
+                left-1/2 
+                transform 
+                -translate-x-1/2 
+                mt-2 
+                bg-black 
+                text-white 
+                text-xs 
+                px-3 
+                py-2 
+                rounded-lg 
+                opacity-0 
+                group-hover:opacity-100 
+                transition-opacity 
+                duration-300 
+                z-10
+              "
+            >
+              Choose two rockets before take off
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
