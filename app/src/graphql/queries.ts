@@ -6,6 +6,7 @@ export const GET_ROCKETS = gql`
       id
       name
       description
+      image
     }
   }
 `;
