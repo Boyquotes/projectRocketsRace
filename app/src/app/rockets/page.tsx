@@ -5,8 +5,10 @@ import { GET_ROCKETS } from '@/graphql/queries';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
+import { useRouter } from 'next/navigation';
 
 export default function RocketsPage() {
+  const router = useRouter();
   const { loading, error, data } = useQuery(GET_ROCKETS);
   const [selectedRockets, setSelectedRockets] = useState<string[]>([]);
   const [socket, setSocket] = useState<any>(null);
@@ -63,9 +65,10 @@ export default function RocketsPage() {
   };
 
   const handleLaunchRace = () => {
-    // Placeholder for race launch logic
-    console.log('Launching race with rockets:', selectedRockets);
-    socket?.emit('launch-race', selectedRockets);
+    console.log('selectedRockets', selectedRockets)
+    if (selectedRockets.length === 2) {
+      router.push('/race');
+    }
   };
 
   if (loading) return <p>Loading rockets...</p>;
