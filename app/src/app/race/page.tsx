@@ -54,14 +54,14 @@ export default function RacePage() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Rocket Race</h1>
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-3">
         {selectedRockets.map((rocket: any) => (
           <div 
             key={rocket.id} 
-            className="border p-4 rounded-lg shadow-xl flex flex-col items-center bg-white"
+            className="border p-2 rounded-lg shadow-xl flex flex-col items-center bg-white"
           >
             {rocket.image && (
-              <div className="mb-4 w-full h-64 relative overflow-hidden rounded-lg">
+              <div className="mb-2 w-full h-32 relative overflow-hidden rounded-lg">
                 <Image 
                   src={rocket.image} 
                   alt={rocket.name} 
@@ -71,13 +71,13 @@ export default function RacePage() {
                 />
               </div>
             )}
-            <h2 className="text-xl font-semibold mb-2">{rocket.name}</h2>
-            <p className="text-center mb-4">{rocket.description}</p>
+            <h2 className="text-sm font-semibold mb-1 text-black">{rocket.name}</h2>
+            <p className="text-xs text-center mb-2 text-black">{rocket.description}</p>
             
             {/* Add race-specific details here */}
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+            <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
               <div 
-                className="bg-blue-600 h-2.5 rounded-full" 
+                className="bg-blue-600 h-1.5 rounded-full" 
                 style={{ width: '0%' }}
               ></div>
             </div>
@@ -87,8 +87,9 @@ export default function RacePage() {
                 bg-green-500 
                 text-white 
                 font-bold 
-                py-2 px-4 
+                py-1 px-3 
                 rounded-full 
+                text-xs
                 hover:bg-green-600 
                 transition-colors
               "
