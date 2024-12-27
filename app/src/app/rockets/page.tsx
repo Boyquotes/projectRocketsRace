@@ -40,6 +40,12 @@ export default function RocketsPage() {
     localStorage.setItem('selectedRockets', JSON.stringify(newSelectedRockets));
   };
 
+  const handleLaunchRace = () => {
+    // Placeholder for race launch logic
+    console.log('Launching race with rockets:', selectedRockets);
+    // You can add more complex logic here later
+  };
+
   if (loading) return <p>Loading rockets...</p>;
   if (error) return <p>Error loading rockets: {error.message}</p>;
 
@@ -82,6 +88,33 @@ export default function RocketsPage() {
             )}
           </div>
         ))}
+      </div>
+      
+      <div className="flex justify-center mt-6">
+        <button 
+          onClick={handleLaunchRace}
+          disabled={selectedRockets.length !== 2}
+          className={`
+            flex items-center
+            font-bold 
+            py-3 px-6 
+            rounded-full 
+            shadow-lg 
+            transform 
+            transition-all 
+            duration-300 
+            focus:outline-none 
+            focus:ring-2 
+            focus:ring-opacity-50
+            ${selectedRockets.length === 2 
+              ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 active:scale-95 hover:shadow-xl focus:ring-blue-500' 
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'}
+          `}
+        >
+          <span className="flex items-center">
+            🚀 Launch the Race 🏁
+          </span>
+        </button>
       </div>
     </div>
   );
