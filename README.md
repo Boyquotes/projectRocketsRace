@@ -1,3 +1,5 @@
+Solution:
+
 # Challenge de développement - Course de fusées 🚀
 
 ## Objectif
