@@ -9,6 +9,25 @@ export const GET_ROCKETS = gql`
       image
     }
   }
+`;export const GET_RACES = gql`
+  query {
+    races {
+      id
+      rocket1 {
+        id
+        progress
+        exploded
+      }
+      rocket2 {
+        id
+        progress
+        exploded
+      }
+      winner {
+        id
+      }
+    }
+  }
 `;
 
 export const START_RACE_MUTATION = gql`

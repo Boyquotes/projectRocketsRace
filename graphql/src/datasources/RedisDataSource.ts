@@ -68,4 +68,24 @@ export default class RedisDataSource {
         this.pubsub.publish(topic, message)
     }
 
+    async getAllRaces() {
+        // Get all keys that match the race pattern
+        const keys = await this.redis.keys('race:*');
+        
+        if (keys.length === 0) {
+            return [];
+        }
+
+        // Get all race data
+        const races = await Promise.all(
+            keys.map(async (key) => {
+                const raceData = await this.redis.get(key);
+                return raceData ? JSON.parse(raceData) : null;
+            })
+        );
+
+        // Filter out any null values and return valid races
+        return races.filter(race => race !== null);
+    }
+    
 }

@@ -35,7 +35,24 @@ const queryResolvers: QueryResolvers = {
                 ...race,
                 winner
             };
-        }
+        },
+        races: async (_, __, { dataSources }) => {
+            const races = await dataSources.redis.getAllRaces();
+            return races.map(race => ({
+                id: race.id,
+                rocket1: {
+                    id: race.rocket1.id,
+                    progress: race.rocket1.progress,
+                    exploded: race.rocket1.exploded
+                },
+                rocket2: {
+                    id: race.rocket2.id,
+                    progress: race.rocket2.progress,
+                    exploded: race.rocket2.exploded
+                },
+                winner: race.winner
+            }));
+        },
     },
     Mutation: {
         startRace: async (_, {rocket1: rocket1Id, rocket2: rocket2Id}, {dataSources}) => {

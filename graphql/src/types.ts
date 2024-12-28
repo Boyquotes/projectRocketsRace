@@ -31,6 +31,7 @@ export type MutationStartRaceArgs = {
 export type Query = {
   __typename?: 'Query';
   race?: Maybe<Race>;
+  races: Array<Race>;
   rockets: Array<Rocket>;
 };
 
@@ -197,6 +198,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   race?: Resolver<Maybe<ResolversTypes['Race']>, ParentType, ContextType, RequireFields<QueryRaceArgs, 'id'>>;
+  races?: Resolver<Array<ResolversTypes['Race']>, ParentType, ContextType>;
   rockets?: Resolver<Array<ResolversTypes['Rocket']>, ParentType, ContextType>;
 }>;
 

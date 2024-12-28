@@ -1,6 +1,7 @@
 type Query {
     rockets: [Rocket!]!
     race(id: ID!): Race
+    races: [Race!]!
 }
 
 type Mutation {
