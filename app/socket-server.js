@@ -14,13 +14,14 @@ const io = new Server(server, {
 let selectedRockets = [];
 
 io.on('connection', (socket) => {
-  console.log('New client connected');
+  console.log('New client connected', socket.id);
 
   // Sync initial rocket selection
   socket.emit('rocket-selection', selectedRockets);
 
   // Handle rocket selection
   socket.on('rocket-selection', (rocketIds) => {
+    console.log('Rocket selection received:', rocketIds);
     selectedRockets = rocketIds;
     socket.broadcast.emit('rocket-selection', rocketIds);
   });
@@ -31,13 +32,19 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('rocket-selection', rocketIds);
   });
 
-  // Handle race launch
-  socket.on('launch-race', (rocketIds) => {
-    socket.broadcast.emit('race-launched', rocketIds);
+  // Enhanced race launch handling
+  socket.on('race-launched', (rocketIds) => {
+    console.log('Race launched with rockets:', rocketIds);
+    // Broadcast race launch to all other connected clients
+    io.emit('race-launched', {
+      rocketIds: rocketIds,
+      initiatorSocketId: socket.id
+    });
   });
 
   // Existing race invitation logic
   socket.on('race-invitation', (selectedRocketIds) => {
+    console.log('Received race invitation for rockets:', selectedRocketIds);
     socket.broadcast.emit('race-invitation', selectedRocketIds);
   });
 
@@ -55,7 +62,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+    console.log('Client disconnected', socket.id);
   });
 });
 

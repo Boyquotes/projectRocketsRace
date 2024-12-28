@@ -12,6 +12,8 @@ export default function RocketsPage() {
   const { loading, error, data } = useQuery(GET_ROCKETS);
   const [selectedRockets, setSelectedRockets] = useState<string[]>([]);
   const [socket, setSocket] = useState<any>(null);
+  const [raceLaunchedBy, setRaceLaunchedBy] = useState<string | null>(null);
+
 
   useEffect(() => {
     // Create socket connection
@@ -24,7 +26,17 @@ export default function RocketsPage() {
     // Listen for synchronized rocket selections
     newSocket.on('rocket-selection', (selectedRocketIds: string[]) => {
       setSelectedRockets(selectedRocketIds);
+      console.log('Race selectedRocketIds received:', selectedRocketIds);
       localStorage.setItem('selectedRockets', JSON.stringify(selectedRocketIds));
+    });
+
+    // Listen for race launched event
+    newSocket.on('race-launched', (data: { rocketIds: string[], initiatorSocketId: string }) => {
+      console.log('Race launched received:', data);
+      setRaceLaunchedBy(data.initiatorSocketId);
+      
+      // Optional: Add additional logic here if needed
+      // For example, you might want to update some state or trigger an action
     });
 
     // Load previously selected rockets from local storage
@@ -67,7 +79,15 @@ export default function RocketsPage() {
   const handleLaunchRace = () => {
     console.log('selectedRockets', selectedRockets)
     if (selectedRockets.length === 2) {
-      router.push('/race');
+      console.log('Race launched');
+      // Emit race-launched event to all connected clients
+      socket?.emit('race-launched', selectedRockets);
+      
+      // Optional: Add a race invitation event if needed
+      socket?.emit('race-invitation', selectedRockets);
+      
+      // Navigate to race page
+      // router.push('/race');
     }
   };
 
@@ -169,6 +189,39 @@ export default function RocketsPage() {
               Choose two rockets before take off
             </div>
           )}
+
+      {/* Race Launched Debug Text */}
+      {raceLaunchedBy && (
+        <div className="text-center mt-4 p-2 bg-yellow-100 text-yellow-800 rounded-lg">
+          🏁 Race Launched! 
+          <br />
+          Initiated by Socket ID: {raceLaunchedBy.slice(0, 8)}...
+        </div>
+      )}
+
+            <div 
+              className="
+                absolute 
+                top-full 
+                left-1/2 
+                transform 
+                -translate-x-1/2 
+                mt-2 
+                bg-black 
+                text-white 
+                text-xs 
+                px-3 
+                py-2 
+                rounded-lg 
+                opacity-0 
+                group-hover:opacity-100 
+                transition-opacity 
+                duration-300 
+                z-10
+              "
+            >
+              Race launched by {raceLaunchedBy}
+            </div>
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "socket-server": "node socket-server.js",
+    "socket-server": "node --watch socket-server.js",
     "lint": "next lint"
   },
   "dependencies": {
