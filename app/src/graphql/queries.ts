@@ -9,7 +9,8 @@ export const GET_ROCKETS = gql`
       image
     }
   }
-`;export const GET_RACES = gql`
+`;
+export const GET_RACES = gql`
   query {
     races {
       id
@@ -23,9 +24,7 @@ export const GET_ROCKETS = gql`
         progress
         exploded
       }
-      winner {
-        id
-      }
+      winner
     }
   }
 `;
