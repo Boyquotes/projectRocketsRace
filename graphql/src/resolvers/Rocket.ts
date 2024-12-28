@@ -42,11 +42,13 @@ const queryResolvers: QueryResolvers = {
                 id: race.id,
                 rocket1: {
                     id: race.rocket1.id,
+                    image: race.rocket1.image,
                     progress: race.rocket1.progress,
                     exploded: race.rocket1.exploded
                 },
                 rocket2: {
                     id: race.rocket2.id,
+                    image: race.rocket2.image,
                     progress: race.rocket2.progress,
                     exploded: race.rocket2.exploded
                 },
