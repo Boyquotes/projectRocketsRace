@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rocket App",
+  title: "Rockets Races",
   description: "Rocket exploration application",
 };
 
@@ -29,9 +29,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <nav className="bg-gray-100 p-4">
-          <div className="container mx-auto flex justify-between items-center">
-            <Link href="/" className="text-xl font-bold">Home</Link>
-            <Link href="/rockets" className="text-lg hover:underline">Rockets</Link>
+          <div className="container mx-auto flex items-center space-x-4">
+            <div className="flex-grow">
+              <div className="flex space-x-4 items-center">
+                <Link href="/" className="text-xl font-bold text-black hover:opacity-70 transition-opacity duration-200">Home</Link>
+                <Link href="/rockets" className="text-lg text-black hover:opacity-70 transition-opacity duration-200">Rockets Races</Link>
+                <Link href="/races" className="text-lg text-black hover:opacity-70 transition-opacity duration-200">Admin Races</Link>
+              </div>
+            </div>
           </div>
         </nav>
         <Providers>

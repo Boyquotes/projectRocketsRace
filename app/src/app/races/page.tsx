@@ -12,7 +12,13 @@ export default function RacesPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Race History</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Race History</h1>
+        <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full">
+          Total Races: {data.races.length}
+        </div>
+      </div>
+
       {data.races.length === 0 ? (
         <p className="text-gray-900">No races have been run yet.</p>
       ) : (
@@ -20,7 +26,7 @@ export default function RacesPage() {
           {data.races.map((race: any) => (
             <div 
               key={race.id} 
-              className="bg-white shadow-lg rounded-lg overflow-hidden border p-4 text-black"
+              className="bg-blue-200 shadow-lg rounded-lg overflow-hidden border p-4 text-black"
             >
               <div className="text-center">
                 <h2 className="text-xl font-semibold mb-2">

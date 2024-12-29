@@ -30,7 +30,7 @@ export const GET_RACES = gql`
 `;
 
 export const START_RACE_MUTATION = gql`
-  mutation StartRace($rocket1: String!, $rocket2: String!) {
+  mutation StartRace($rocket1: ID!, $rocket2: ID!) {
     startRace(rocket1: $rocket1, rocket2: $rocket2) {
       id
       rocket1 {
@@ -44,6 +44,17 @@ export const START_RACE_MUTATION = gql`
         exploded
       }
       winner
+    }
+  }
+`;
+
+export const ROCKET_PROGRESS_SUBSCRIPTION = gql`
+  subscription OnRocketProgress($raceId: ID!, $rocketId: ID!) {
+    rocketProgress(raceId: $raceId, rocketId: $rocketId) {
+      raceId
+      rocketId
+      progress
+      exploded
     }
   }
 `;

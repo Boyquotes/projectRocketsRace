@@ -1,9 +1,9 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
-import { GET_ROCKETS } from '@/graphql/queries';
+import { useQuery, useMutation, useSubscription } from '@apollo/client';
+import { GET_ROCKETS, START_RACE_MUTATION, ROCKET_PROGRESS_SUBSCRIPTION } from '@/graphql/queries';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
 
@@ -13,7 +13,99 @@ export default function RocketsPage() {
   const [selectedRockets, setSelectedRockets] = useState<string[]>([]);
   const [socket, setSocket] = useState<any>(null);
   const [raceLaunchedBy, setRaceLaunchedBy] = useState<string | null>(null);
+  const [raceProgressDebug, setRaceProgressDebug] = useState<any>(null);
 
+  interface RaceData {
+    startRace: {
+      id: string;
+      rocket1: {
+        id: number;
+        progress: number;
+        exploded: boolean;
+      };
+      rocket2: {
+        id: number;
+        progress: number;
+        exploded: boolean;
+      };
+      winner: string | null;
+    };
+  }
+
+  const [startRace, { data: raceData, loading: raceLoading, error: raceError }] = useMutation<RaceData>(START_RACE_MUTATION);
+
+  // Create a more robust method to get subscription variables
+  const getSubscriptionVariables = useCallback(() => {
+    // Ensure both raceId and rocketId are non-null and non-empty
+    if (
+      raceData?.startRace?.id && 
+      raceData.startRace.rocket1?.id
+    ) {
+      return { 
+        raceId: String(raceData.startRace.id),
+        rocketId: String(raceData.startRace.rocket1.id)
+      };
+    }
+    return null;
+  }, [raceData?.startRace]);
+
+  // Track whether subscription should be active
+  const [isSubscriptionReady, setIsSubscriptionReady] = useState(false);
+
+  // Update subscription readiness when race data is available
+  useEffect(() => {
+    if (raceData?.startRace?.id && raceData.startRace.rocket1?.id) {
+      setIsSubscriptionReady(true);
+    }
+  }, [raceData]);
+
+  // Subscription for rocket progress
+  const { data: progressData, error: progressError } = useSubscription(
+    ROCKET_PROGRESS_SUBSCRIPTION, 
+    { 
+      variables: getSubscriptionVariables() || {},
+      skip: !isSubscriptionReady, // More explicit skip condition
+      onSubscriptionComplete: () => {
+        console.log('Rocket Progress Subscription Completed');
+      },
+      onSubscriptionData: ({ subscriptionData }) => {
+        console.log('Subscription Data Received:', subscriptionData);
+      }
+    }
+  );
+
+  // Update debug info when progress data changes
+  useEffect(() => {
+    if (progressData?.rocketProgress) {
+      console.log('Rocket Progress Update:', progressData.rocketProgress);
+      
+      // Restructure the progress data to match previous format
+      const rocketProgressDebugData = {
+        raceId: progressData.rocketProgress.raceId,
+        rocket1: {
+          id: progressData.rocketProgress.rocketId,
+          progress: progressData.rocketProgress.progress,
+          exploded: progressData.rocketProgress.exploded
+        },
+        rocket2: {
+          id: progressData.rocketProgress.rocketId,
+          progress: progressData.rocketProgress.progress,
+          exploded: progressData.rocketProgress.exploded
+        }
+      };
+
+      setRaceProgressDebug(rocketProgressDebugData);
+    }
+  }, [progressData]);
+
+  // Comprehensive error handling
+  useEffect(() => {
+    if (progressError) {
+      console.error('Rocket Progress Subscription Error:', progressError);
+      // Optionally reset subscription readiness
+      setIsSubscriptionReady(false);
+    }
+  }, [progressError]);
 
   useEffect(() => {
     // Create socket connection
@@ -80,6 +172,18 @@ export default function RocketsPage() {
     console.log('selectedRockets', selectedRockets)
     if (selectedRockets.length === 2) {
       console.log('Race launched');
+      console.log(selectedRockets[0], selectedRockets[1])
+      // Start race mutation
+      startRace({
+        variables: {
+          rocket1: selectedRockets[0],
+          rocket2: selectedRockets[1]
+        },
+        onError: (error) => {
+          console.error('Race Start Error:', error);
+          // Optionally show error to user
+        }
+      });
       // Emit race-launched event to all connected clients
       socket?.emit('race-launched', selectedRockets);
       
@@ -190,38 +294,70 @@ export default function RocketsPage() {
             </div>
           )}
 
-      {/* Race Launched Debug Text */}
-      {raceLaunchedBy && (
-        <div className="text-center mt-4 p-2 bg-yellow-100 text-yellow-800 rounded-lg">
-          🏁 Race Launched! 
-          <br />
-          Initiated by Socket ID: {raceLaunchedBy.slice(0, 8)}...
-        </div>
-      )}
-
-            <div 
-              className="
-                absolute 
-                top-full 
-                left-1/2 
-                transform 
-                -translate-x-1/2 
-                mt-2 
-                bg-black 
-                text-white 
-                text-xs 
-                px-3 
-                py-2 
-                rounded-lg 
-                opacity-0 
-                group-hover:opacity-100 
-                transition-opacity 
-                duration-300 
-                z-10
-              "
-            >
-              Race launched by {raceLaunchedBy}
+          {/* Race Launched Debug Text */}
+          {raceLaunchedBy && (
+            <div className="text-center mt-4 p-2 bg-yellow-100 text-yellow-800 rounded-lg">
+              🏁 Race Launched! 
+              <br />
+              Initiated by Socket ID: {raceLaunchedBy.slice(0, 8)}...
             </div>
+          )}
+
+          <div 
+            className="
+              absolute 
+              top-full 
+              left-1/2 
+              transform 
+              -translate-x-1/2 
+              mt-2 
+              bg-black 
+              text-white 
+              text-xs 
+              px-3 
+              py-2 
+              rounded-lg 
+              opacity-0 
+              group-hover:opacity-100 
+              transition-opacity 
+              duration-300 
+              z-10
+            "
+          >
+            Race launched by {raceLaunchedBy}
+          </div>
+
+          {/* Debug Section for Race Launch */}
+          {raceData?.startRace && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg text-yellow-800">
+              <h3 className="font-bold mb-2">Race Launch Debug</h3>
+              <div>
+                <p>Race ID: {raceData.startRace.id}</p>
+                <p>Rocket 1 ID: {raceData.startRace.rocket1.id}</p>
+                <p>Rocket 2 ID: {raceData.startRace.rocket2.id}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Debug Section for Rocket Progress */}
+          {raceProgressDebug && (
+            <div className="mt-4 p-4 bg-green-50 rounded-lg">
+              <h3 className="font-bold mb-2">Rocket Progress Debug</h3>
+              <div>
+                <p>Race ID: {raceProgressDebug.raceId}</p>
+                <div>
+                  <h4>Rocket 1</h4>
+                  <p>Progress: {raceProgressDebug.rocket1.progress.toFixed(2)}%</p>
+                  <p>Exploded: {raceProgressDebug.rocket1.exploded ? 'Yes' : 'No'}</p>
+                </div>
+                <div>
+                  <h4>Rocket 2</h4>
+                  <p>Progress: {raceProgressDebug.rocket2.progress.toFixed(2)}%</p>
+                  <p>Exploded: {raceProgressDebug.rocket2.exploded ? 'Yes' : 'No'}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
