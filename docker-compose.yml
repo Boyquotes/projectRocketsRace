@@ -1,4 +1,20 @@
 services:
+  rockets-frontend:
+    image: rockets-frontend
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    restart: always
+    volumes:
+      - ./app/:/usr/src/app
+    ports:
+      - "3000:3000"
+    command: ["sh", "-c", "npm install && npm run dev"]
+    networks:
+      - app-network
+    depends_on:
+      - graphql-node
+
   # Node container
   graphql-node:
     build:
@@ -9,7 +25,7 @@ services:
     volumes:
       - ./graphql:/var/www
     networks:
-      default:
+      app-network:
         aliases:
           - graphql
     working_dir: /var/www
@@ -19,3 +35,7 @@ services:
     image: redis:latest
     ports:
       - 6379:6379
+
+networks:
+  app-network:  # Defining the shared network
+    driver: bridge  # This creates a bridge network, the default driver
