@@ -107,7 +107,7 @@ async function start() {
     app.use('/static', express.static(path.join(__dirname, '../static')));
 
     // Server startup
-    await new Promise<void>((resolve) => httpServer.listen({port: 4000}, resolve));
+    await new Promise<void>((resolve) => httpServer.listen({port: 4000, host: '0.0.0.0'}, resolve));
     console.log(`🚀 Server ready at http://localhost:4000/`);
 }
 
