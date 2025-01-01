@@ -49,7 +49,7 @@ export const START_RACE_MUTATION = gql`
 `;
 
 export const ROCKET_PROGRESS_SUBSCRIPTION = gql`
-  subscription OnRocketProgress($raceId: ID!, $rocketId: ID!) {
+  subscription rocketProgress($raceId: ID!, $rocketId: ID!) {
     rocketProgress(raceId: $raceId, rocketId: $rocketId) {
       raceId
       rocketId

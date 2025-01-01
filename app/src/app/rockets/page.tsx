@@ -41,6 +41,8 @@ export default function RocketsPage() {
       raceData?.startRace?.id && 
       raceData.startRace.rocket1?.id
     ) {
+      console.log("racID ", raceData.startRace.id)
+      console.log("rocketId ", raceData.startRace.rocket1.id)
       return { 
         raceId: String(raceData.startRace.id),
         rocketId: String(raceData.startRace.rocket1.id)
@@ -48,6 +50,16 @@ export default function RocketsPage() {
     }
     return null;
   }, [raceData?.startRace]);
+
+  // useEffect(() => {
+  //     console.log('Rocket Progress PubSub:');
+  //     const { data, loading } = useSubscription(
+  //       ROCKET_PROGRESS_SUBSCRIPTION,
+  //       {  }
+  //     );
+  //     console.log(data)
+  // }, [raceData?.startRace?.id]);
+
 
   // Track whether subscription should be active
   const [isSubscriptionReady, setIsSubscriptionReady] = useState(false);
@@ -65,15 +77,14 @@ export default function RocketsPage() {
     { 
       variables: getSubscriptionVariables() || {},
       skip: !isSubscriptionReady, // More explicit skip condition
-      onSubscriptionComplete: () => {
+      onComplete: () => {
         console.log('Rocket Progress Subscription Completed');
       },
-      onSubscriptionData: ({ subscriptionData }) => {
-        console.log('Subscription Data Received:', subscriptionData);
+      onData: ({ }) => {
+        console.log('Subscription Data Received in OnData:');
       }
     }
   );
-
   // Update debug info when progress data changes
   useEffect(() => {
     if (progressData?.rocketProgress) {

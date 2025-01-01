@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'http',
-        hostname: 'graphql-node',
+        hostname: 'recruitment-challenge-front-graphql-node-1',
         pathname: '**',
       },
     ],

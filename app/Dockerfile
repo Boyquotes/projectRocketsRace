@@ -17,4 +17,6 @@ EXPOSE 3000
 #WORKDIR /usr/src/app/dashboard
 #ENTRYPOINT ["/bin/bash", "/usr/src/app/entrypoint.sh"]
 #CMD ["npm", "start-dashboard"]
-CMD node --watch socket-server.js
+#CMD node --watch socket-server.js
+
+ENTRYPOINT ["/usr/src/app/script.sh"]

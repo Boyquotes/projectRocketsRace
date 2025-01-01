@@ -68,7 +68,7 @@ const queryResolvers: QueryResolvers = {
             }
 
             const raceId = uuidv4();
-
+            console.log("raceId debug", raceId)
             const raceStatus: RaceStatus = {
                 id: raceId,
                 rocket1: {
@@ -128,27 +128,27 @@ const race = async (redis: RedisDataSource, raceStatus: RaceStatus) => {
 
 const raceProgress = async (redis: RedisDataSource, race: RaceStatus) => {
     const randomExplosion = Math.floor(Math.random() * 40) + 1
-
+    console.log("randomExplosion ", randomExplosion)
     
     race.rocket1.progress += Math.floor(Math.random() * 10) + 1
     race.rocket2.progress += Math.floor(Math.random() * 10) + 1
-
+    console.log(race.id);
     if(randomExplosion === 1) {
-        race.rocket1.exploded = true
+        // race.rocket1.exploded = true
         race.rocket1.progress = race.rocket1.progress === 100 ? 99 : race.rocket1.progress
     } else if(randomExplosion === 2) {
-        race.rocket2.exploded = true
+        // race.rocket2.exploded = true
         race.rocket2.progress = race.rocket2.progress === 100 ? 99 : race.rocket2.progress
     }
 
 
-    if(race.rocket1.progress >= 100) {
-        race.rocket1.progress = 100
-    }
+    // if(race.rocket1.progress >= 100) {
+    //     race.rocket1.progress = 100
+    // }
 
-    if(race.rocket2.progress >= 100) {
-        race.rocket2.progress = 100
-    }
+    // if(race.rocket2.progress >= 100) {
+    //     race.rocket2.progress = 100
+    // }
 
     redis.publish('ROCKET_PROGRESS', {
         raceId: race.id,
@@ -168,15 +168,15 @@ const raceProgress = async (redis: RedisDataSource, race: RaceStatus) => {
 }
 
 const getWinner = (race: RaceStatus) => {
-    if(race.rocket1.progress === 100 && race.rocket1.exploded === false) {
-        return race.rocket1.id
-    }  else if(race.rocket2.progress === 100 && race.rocket2.exploded === false) {
-        return race.rocket2.id
-    } else if(race.rocket1.exploded) {
-        return race.rocket2.id
-    } else if(race.rocket2.exploded) {
-        return race.rocket1.id
-    }
+    // if(race.rocket1.progress === 100 && race.rocket1.exploded === false) {
+    //     return race.rocket1.id
+    // }  else if(race.rocket2.progress === 100 && race.rocket2.exploded === false) {
+    //     return race.rocket2.id
+    // } else if(race.rocket1.exploded) {
+    //     return race.rocket2.id
+    // } else if(race.rocket2.exploded) {
+    //     return race.rocket1.id
+    // }
     return null
 }
 
