@@ -130,7 +130,8 @@ export default function RocketsPage() {
   // Update debug info when progress data changes
   useEffect(() => {
     if (progressData?.rocketProgress && progressData2?.rocketProgress) {
-      console.log('Rocket Progress Update:', progressData.rocketProgress);
+      console.log('Rocket Progress Update rocket 1:', progressData.rocketProgress);
+      console.log('Rocket Progress Update rocket 2:', progressData2.rocketProgress);
       
       // Restructure the progress data to match previous format
       const rocketProgressDebugData = {
@@ -356,17 +357,16 @@ console.log("selectedRocketsTab", selectedRocketsTab)
       {raceLaunchedBy && (
       <div>
         <div className="mt-12">
+          {/* Debug Section for Race Launch */}
+          {raceData?.startRace && selectedRocketsTab && raceProgressDebug && (
+            <div className="flex mt-4 p-4 bg-blue-50 rounded-lg text-yellow-800">
+                {selectedRocketsTab.map((rocket: any) => (
+                  <RocketLaunch key={rocket.id} rocketInfo={rocket} raceProgressDebug={raceProgressDebug}/>
+                ))}
+            </div>
+          )}
           <h2 className="text-2xl font-bold mb-4">Debug Info</h2>
           <div className="max-w-8xl">
-
-            {/* Debug Section for Race Launch */}
-            {raceData?.startRace && selectedRocketsTab && raceProgressDebug && (
-              <div className="flex mt-4 p-4 bg-blue-50 rounded-lg text-yellow-800">
-                  {selectedRocketsTab.map((rocket: any) => (
-                    <RocketLaunch key={rocket.id} rocketInfo={rocket} raceProgressDebug={raceProgressDebug}/>
-                  ))}
-              </div>
-            )}
 
             {/* Race Launched Debug Text */}
             {raceLaunchedBy && (

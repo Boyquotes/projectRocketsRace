@@ -15,7 +15,7 @@
 }
 
 .scene.launch {
-  animation: scrollBackground 20s linear forwards;
+  animation: scrollBackground 28s linear forwards;
 }
 
 .rocket {
@@ -45,7 +45,25 @@
 
 .exhaust_flame {
   position: absolute;
-  bottom: 20px;
+  bottom: 30px;
+  left: 27px;
+  width: 11px;
+  height: 10px;
+  background: linear-gradient(to bottom,
+    #ff0000 0%,   /* red at top */
+    #ff4d00 50%,  /* bright orange at middle */
+    #ffd700 100%  /* yellow in bottom */
+  );
+  border-radius: 0 0 50% 50%;
+  animation: flame 0.5s infinite;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.exhaust_flame_middle {
+  position: absolute;
+  bottom: 25px;
   left: 27px;
   width: 11px;
   height: 15px;
@@ -61,57 +79,29 @@
   transition: opacity 0.3s, visibility 0.3s;
 }
 
-.launch .exhaust_flame {
+.exhaust_flame_high {
+  position: absolute;
+  bottom: 22px;
+  left: 27px;
+  width: 11px;
+  height: 18px;
+  background: linear-gradient(to bottom,
+    #e59408 0%,   /* red at top */
+    #eda33c 50%,  /* bright orange at middle */
+    #e0d073 100%  /* yellow in bottom */
+  );
+  border-radius: 0 0 50% 50%;
+  animation: flame 0.5s infinite;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+
+.launch .exhaust_flame, .launch .exhaust_flame_middle, .launch .exhaust_flame_high {
   opacity: 1;
   visibility: visible;
 }
-
-@keyframes flame {
-  0% {
-    transform: translateY(0) translateX(0);
-  }
-  25% {
-    transform: translateY(0) translateX(-5px);
-  }
-  50% {
-
-    transform: translateY(0) translateX(5px);
-  }
-  75% {
-    transform: translateY(0) translateX(-5px);
-  }
-  100% {
-    transform: translateY(0) translateX(0);
-  }
-    
-}
-
-@keyframes shake {
-  0% {
-    transform: translateY(0) translateX(0);
-  }
-  25% {
-    transform: translateY(0) translateX(-2px);
-  }
-  50% {
-    transform: translateY(0) translateX(2px);
-  }
-  75% {
-    transform: translateY(0) translateX(-2px);
-  }
-  100% {
-    transform: translateY(0) translateX(0);
-  }
-} 
-
-@keyframes scrollBackground {
-  from {
-    background-position: center bottom;
-  }
-  to {
-    background-position: center top;
-  }
-} 
 
 .playButton {
   position: absolute;
@@ -174,4 +164,96 @@
 
 .explosionButton:hover {
   background-color: #ffaa00;
+}
+
+.explosion {
+  object-fit: contain !important;
+  animation: explode 3s forwards;
+  transform-origin: center;
+}
+.winner {
+  object-fit: contain !important;
+  animation: explode 13s forwards;
+  transform-origin: center;
+}
+
+.progression{
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 3%;
+  font-size: 3em;
+  font-weight: bold;
+  color: gray;
+}
+
+@keyframes explode {
+  0% {
+    opacity: 1;
+    transform: scale(0.5) rotate(0deg);
+  }
+  20% {
+    transform: scale(1.2) rotate(-10deg);
+  }
+  40% {
+    transform: scale(1) rotate(10deg);
+  }
+  60% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  80% {
+    transform: scale(0.9) rotate(5deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+} 
+
+@keyframes flame {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(0) translateX(-5px);
+  }
+  50% {
+
+    transform: translateY(0) translateX(5px);
+  }
+  75% {
+    transform: translateY(0) translateX(-5px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+    
+}
+
+@keyframes shake {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(0) translateX(-2px);
+  }
+  50% {
+    transform: translateY(0) translateX(2px);
+  }
+  75% {
+    transform: translateY(0) translateX(-2px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+} 
+
+@keyframes scrollBackground {
+  from {
+    background-position: center bottom;
+  }
+  to {
+    background-position: center top;
+  }
 } 

@@ -30,8 +30,13 @@ interface RocketLaunchProps {
 
 export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLaunchProps) {
   const [launch, setLaunch] = useState(false);
+  const [destroy, setDestroy] = useState(false);
+  const [showExplosion, setShowExplosion] = useState(false);
+  const [showWinner, setShowWinner] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const explosionAudioRef = useRef<HTMLAudioElement | null>(null);
+  const winnerAudioRef = useRef<HTMLAudioElement | null>(null);
+  
 
 
   useEffect(() => {
@@ -58,12 +63,35 @@ export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLau
     console.log("explosion rocket2.exploded", raceProgressDebug.rocket2.exploded)
     if(raceProgressDebug.rocket1.exploded == true || raceProgressDebug.rocket2.exploded == true){
       console.log('EXPLODED');
-      handlePlayExplosion();
+      handleStopSound();
+      setDestroy(true);
+      setShowExplosion(true);
+      if (explosionAudioRef.current) {
+        explosionAudioRef.current.play().catch(() => {
+          console.log('Explosion sound autoplay prevented');
+        });
+      }
+      // Hide explosion after animation
+      const timer = setTimeout(() => {
+        setShowExplosion(false);
+      }, 3000);
+      return () => clearTimeout(timer);
     }
     // if(raceProgressDebug.rocket1.progress > 20 || raceProgressDebug.rocket2.progress > 20){
-    if(raceProgressDebug.rocket1.progress > 20 && rocketInfo.id == raceProgressDebug.rocket1.id){
-      console.log('PROGRESSED ', raceProgressDebug.rocket1.id);
-      handlePlayExplosion();
+    if( (raceProgressDebug.rocket1.progress > 99 && rocketInfo.id == raceProgressDebug.rocket1.id) || (raceProgressDebug.rocket2.progress > 99 && rocketInfo.id == raceProgressDebug.rocket2.id)){
+      console.log('PROGRESSED 1', raceProgressDebug.rocket1.id);
+      console.log('PROGRESSED 2', raceProgressDebug.rocket2.id);
+      setShowWinner(true);
+      if (winnerAudioRef.current) {
+        winnerAudioRef.current.play().catch(() => {
+          console.log('Winner sound autoplay prevented');
+        });
+      }
+      // Hide explosion after animation
+      const timer = setTimeout(() => {
+        setShowWinner(false);
+      }, 10000);
+      return () => clearTimeout(timer);
     }
 
   }, [raceProgressDebug]);
@@ -105,27 +133,64 @@ export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLau
         <source src="/audio/explosion.wav" type="audio/wav" />
         Your browser does not support the audio element.
       </audio>
+      <audio 
+        ref={winnerAudioRef}
+      >
+        <source src="/audio/youwin.mp3" type="audio/mpeg" />
+        <source src="/audio/youwin.wav" type="audio/wav" />
+        Your browser does not support the audio element.
+      </audio>
       <div className={styles.audioControls}>
         <button className={styles.playButton} disabled={launch}>
           {rocketInfo.name}
         </button>
-        <button onClick={handleStopSound} className={styles.stopButton}>
-          Stop Music
-        </button>
-        <button onClick={handlePlayExplosion} className={styles.explosionButton}>
-          Play Explosion
-        </button>
       </div>
-      <div className={`${styles.rocket} ${launch ? styles.launch : ''}`}>
-          <Image 
-            src={rocketInfo.image} 
-            alt={rocketInfo.name} 
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className={styles.rocket_image}
-          />
-        <div className={styles.exhaust_flame}></div>
-      </div>
+      {raceProgressDebug.rocket1.progress && rocketInfo.id == raceProgressDebug.rocket1.id && (
+        <div className={styles.progression}>
+          {raceProgressDebug.rocket1.progress}
+        </div>
+      )}
+      {raceProgressDebug.rocket2.progress && rocketInfo.id == raceProgressDebug.rocket2.id && (
+        <div className={styles.progression}>
+          {raceProgressDebug.rocket2.progress}
+        </div>
+      )}
+      {!destroy ? (
+        <div className={`${styles.rocket} ${launch ? styles.launch : ''}`}>
+            <Image 
+              src={rocketInfo.image} 
+              alt={rocketInfo.name} 
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className={styles.rocket_image}
+            />
+          <div className={styles.exhaust_flame_high}></div>
+          <div className={styles.exhaust_flame}></div>
+          <div className={styles.exhaust_flame_middle}></div>
+          {showWinner && (
+            <div className={`${styles.rocket} ${launch ? styles.launch : ''}`}>
+              <Image
+                src="/winner.png"
+                alt="winner"
+                fill
+                sizes="(max-width: 600px)"
+                className={styles.winner}
+              />
+            </div>
+          )}
+        </div>
+      ):
+      showExplosion && (
+        <div className={`${styles.rocket} ${launch ? styles.launch : ''}`}>
+            <Image 
+              src="/explosion.png" 
+              alt="explosion" 
+              fill
+              sizes="(max-width: 600px)"
+              className={styles.explosion}
+            />
+        </div>
+      )}
     </div>
   );
 } 
