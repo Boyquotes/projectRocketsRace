@@ -2,43 +2,21 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { RocketLaunchProps } from '@/types/rocket';
+import RocketAudio from './RocketAudio';
 import styles from './RocketLaunch.module.css';
 
-interface RocketInfo {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-}
-
-interface RocketProgressInfo {
-  id: string;
-  progress: integer;
-  exploded: boolean;
-}
-
-interface RaceProgressDebug {
-  raceId: string;
-  rocket1: RocketProgressInfo;
-  rocket2: RocketProgressInfo;
-}
-
-interface RocketLaunchProps {
-  rocketInfo: RocketInfo;
-  raceProgressDebug: RaceProgressDebug;
-}
-
 export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLaunchProps) {
+  const router = useRouter();
   const [launch, setLaunch] = useState(false);
   const [destroy, setDestroy] = useState(false);
   const [showExplosion, setShowExplosion] = useState(false);
   const [showWinner, setShowWinner] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const explosionAudioRef = useRef<HTMLAudioElement | null>(null);
-  const winnerAudioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(new Audio());
+  const explosionAudioRef = useRef<HTMLAudioElement>(new Audio());
+  const winnerAudioRef = useRef<HTMLAudioElement>(new Audio());
   
-
-
   useEffect(() => {
     // Start launch automatically after a delay
     const timer = setTimeout(() => {
@@ -49,108 +27,86 @@ export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLau
           console.log('Autoplay prevented by browser');
         });
       }
-    }, 2000);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    console.log("rocketInfo.id ", rocketInfo.id)
-    console.log("explosion ", raceProgressDebug)
-    console.log("explosion rocket1.progress", raceProgressDebug.rocket1.progress)
-    console.log("explosion rocket2.progress", raceProgressDebug.rocket2.progress)
-    console.log("explosion rocket1.exploded", raceProgressDebug.rocket1.exploded)
-    console.log("explosion rocket2.exploded", raceProgressDebug.rocket2.exploded)
-    if(raceProgressDebug.rocket1.exploded == true || raceProgressDebug.rocket2.exploded == true){
-      console.log('EXPLODED');
-      handleStopSound();
-      setDestroy(true);
-      setShowExplosion(true);
-      if (explosionAudioRef.current) {
-        explosionAudioRef.current.play().catch(() => {
-          console.log('Explosion sound autoplay prevented');
-        });
-      }
-      // Hide explosion after animation
-      const timer = setTimeout(() => {
-        setShowExplosion(false);
-      }, 3000);
-      return () => clearTimeout(timer);
+  const destroyed = () => {
+    setDestroy(true);
+    setShowExplosion(true);
+    if (explosionAudioRef.current) {
+      explosionAudioRef.current.play().catch(() => {
+        console.log('Explosion sound autoplay prevented');
+      });
     }
-    // if(raceProgressDebug.rocket1.progress > 20 || raceProgressDebug.rocket2.progress > 20){
-    if( (raceProgressDebug.rocket1.progress > 99 && rocketInfo.id == raceProgressDebug.rocket1.id) || (raceProgressDebug.rocket2.progress > 99 && rocketInfo.id == raceProgressDebug.rocket2.id)){
-      console.log('PROGRESSED 1', raceProgressDebug.rocket1.id);
-      console.log('PROGRESSED 2', raceProgressDebug.rocket2.id);
-      setShowWinner(true);
-      if (winnerAudioRef.current) {
-        winnerAudioRef.current.play().catch(() => {
-          console.log('Winner sound autoplay prevented');
-        });
-      }
-      // Hide explosion after animation
-      const timer = setTimeout(() => {
-        setShowWinner(false);
-      }, 10000);
-      return () => clearTimeout(timer);
-    }
-
-  }, [raceProgressDebug]);
-
-  const handlePlaySound = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
-    }
-    setLaunch(true);
-  };
-
-  const handleStopSound = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.currentTime = 0;
     }
-  };
+    // Hide explosion after animation
+    const timer = setTimeout(() => {
+      setShowExplosion(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }
 
-  const handlePlayExplosion = () => {
-    if (explosionAudioRef.current) {
-      explosionAudioRef.current.play();
+  const winnerIs = () => {
+    setShowWinner(true);
+    if (winnerAudioRef.current) {
+      winnerAudioRef.current.play().catch(() => {
+        console.log('Winner sound autoplay prevented');
+      });
     }
-  };
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    // Hide explosion after animation
+    const timer = setTimeout(() => {
+      setShowWinner(false);
+      console.log("RETRY")
+      setLaunch(false);
+    }, 7000);
+    return () => clearTimeout(timer);
+  }
+
+  useEffect(() => {
+    if(raceProgressDebug){
+      if(rocketInfo.id == raceProgressDebug.rocket1.id){
+        if(raceProgressDebug.rocket1.exploded === true){
+          destroyed();
+        }
+        if(raceProgressDebug.rocket1.progress > 99 || raceProgressDebug.rocket2.exploded === true){
+          winnerIs();
+        }
+      }
+      if(rocketInfo.id == raceProgressDebug.rocket2.id){
+        if(raceProgressDebug.rocket2.exploded === true){
+          destroyed();
+        }
+        if(raceProgressDebug.rocket2.progress > 99 || raceProgressDebug.rocket1.exploded === true){
+          winnerIs();
+        }
+      }
+    }
+  }, [raceProgressDebug]);
 
   return (
     <div className={`${styles.scene} ${launch ? styles.launch : ''}`}>
-      <audio 
-        ref={audioRef}
-        loop
-      >
-        <source src="/audio/space-invaders-theme.mp3" type="audio/mpeg" />
-        <source src="/audio/space-invaders-theme.wav" type="audio/wav" />
-        Your browser does not support the audio element.
-      </audio>
-      <audio 
-        ref={explosionAudioRef}
-      >
-        <source src="/audio/explosion.mp3" type="audio/mpeg" />
-        <source src="/audio/explosion.wav" type="audio/wav" />
-        Your browser does not support the audio element.
-      </audio>
-      <audio 
-        ref={winnerAudioRef}
-      >
-        <source src="/audio/youwin.mp3" type="audio/mpeg" />
-        <source src="/audio/youwin.wav" type="audio/wav" />
-        Your browser does not support the audio element.
-      </audio>
-      <div className={styles.audioControls}>
-        <button className={styles.playButton} disabled={launch}>
+      <RocketAudio 
+        audioRef={audioRef}
+        explosionAudioRef={explosionAudioRef}
+        winnerAudioRef={winnerAudioRef}
+      />
+      <div className={styles.nameButton}>
           {rocketInfo.name}
-        </button>
       </div>
-      {raceProgressDebug.rocket1.progress && rocketInfo.id == raceProgressDebug.rocket1.id && (
+      {raceProgressDebug && raceProgressDebug.rocket1.progress && rocketInfo.id == raceProgressDebug.rocket1.id && (
         <div className={styles.progression}>
           {raceProgressDebug.rocket1.progress}
         </div>
       )}
-      {raceProgressDebug.rocket2.progress && rocketInfo.id == raceProgressDebug.rocket2.id && (
+
+      {raceProgressDebug && raceProgressDebug.rocket2.progress && rocketInfo.id == raceProgressDebug.rocket2.id && (
         <div className={styles.progression}>
           {raceProgressDebug.rocket2.progress}
         </div>

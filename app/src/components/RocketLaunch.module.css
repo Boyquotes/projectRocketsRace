@@ -73,7 +73,7 @@
     #ffd700 100%  /* yellow in bottom */
   );
   border-radius: 0 0 50% 50%;
-  animation: flame 0.5s infinite;
+  animation: flameMiddle 1s infinite;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s, visibility 0.3s;
@@ -91,70 +91,32 @@
     #e0d073 100%  /* yellow in bottom */
   );
   border-radius: 0 0 50% 50%;
-  animation: flame 0.5s infinite;
+  animation: flameHigh 0.8s infinite;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s, visibility 0.3s;
 }
-
 
 .launch .exhaust_flame, .launch .exhaust_flame_middle, .launch .exhaust_flame_high {
   opacity: 1;
   visibility: visible;
 }
 
-.playButton {
+.nameButton {
   position: absolute;
   top: 20px;
   left: 20px;
   padding: 10px 20px;
-  background-color: #fff;
+  background-color: #0c13de;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
   z-index: 10;
 }
 
-.playButton:hover {
-  background-color: #ddd;
-} 
-
-.audioControls {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  display: flex;
-  gap: 10px;
-  z-index: 10;
-}
-
-.playButton, .stopButton {
+.nameButton {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
-}
-
-.playButton {
-  background-color: #fff;
-}
-
-.stopButton {
-  background-color: #ff4444;
-  color: white;
-}
-
-.playButton:hover {
-  background-color: #ddd;
-}
-
-.stopButton:hover {
-  background-color: #ff2222;
-}
-
-.playButton:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
 }
 
 .explosionButton {
@@ -184,7 +146,7 @@
   padding: 3%;
   font-size: 3em;
   font-weight: bold;
-  color: gray;
+  color: rgb(186, 169, 169);
 }
 
 @keyframes explode {
@@ -228,7 +190,44 @@
   100% {
     transform: translateY(0) translateX(0);
   }
-    
+}
+
+@keyframes flameMiddle {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(0) translateX(-8px);
+  }
+  50% {
+
+    transform: translateY(0) translateX(8px);
+  }
+  75% {
+    transform: translateY(0) translateX(-8px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+@keyframes flameHigh {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(0) translateX(-3px);
+  }
+  50% {
+
+    transform: translateY(0) translateX(3px);
+  }
+  75% {
+    transform: translateY(0) translateX(-3px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
 }
 
 @keyframes shake {

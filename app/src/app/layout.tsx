@@ -9,13 +9,9 @@ const geistSans = Geist({
   variable: "--font-geist-sans",
 });
 
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "Rockets Races",
-  description: "Rocket exploration application",
+  title: "Rockets Races - Challenge",
+  description: "Rocket racing simulation",
 };
 
 export default function RootLayout({
@@ -26,14 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} antialiased`}
       >
         <nav className="bg-gray-100 p-4">
           <div className="container mx-auto flex items-center space-x-4">
             <div className="flex-grow">
               <div className="flex space-x-4 items-center">
-                <Link href="/" className="text-xl font-bold text-black hover:opacity-70 transition-opacity duration-200">Home</Link>
-                <Link href="/rockets" className="text-lg text-black hover:opacity-70 transition-opacity duration-200">Rockets Races</Link>
+                <Link href="/" className="text-xl font-bold text-black hover:opacity-70 transition-opacity duration-200">Rockets Races</Link>
                 <Link href="/races" className="text-lg text-black hover:opacity-70 transition-opacity duration-200">Admin Races</Link>
               </div>
             </div>

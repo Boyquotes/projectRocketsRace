@@ -134,10 +134,10 @@ const raceProgress = async (redis: RedisDataSource, race: RaceStatus) => {
     race.rocket2.progress += Math.floor(Math.random() * 10) + 1
     console.log(race.id);
     if(randomExplosion === 1) {
-        // race.rocket1.exploded = true
+        race.rocket1.exploded = true
         race.rocket1.progress = race.rocket1.progress === 100 ? 99 : race.rocket1.progress
     } else if(randomExplosion === 2) {
-        // race.rocket2.exploded = true
+        race.rocket2.exploded = true
         race.rocket2.progress = race.rocket2.progress === 100 ? 99 : race.rocket2.progress
     }
 
