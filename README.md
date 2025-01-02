@@ -1,5 +1,14 @@
 Solution:
 
+CI/CD:
+Ajout dans docker-compose.yml du container frontent(app/) qui permet d'ajouter la partie frontend lors du deploiement
+
+Gestion multi-onglet/multi-browsers de la selection des fusées via socket.io
+
+Pistes d'amélioration: [ROADMAP](ROADMAP.md)
+
+------
+
 # Challenge de développement - Course de fusées 🚀
 
 ## Objectif
