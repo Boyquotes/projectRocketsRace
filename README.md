@@ -1,7 +1,13 @@
 Solution:
 
+Pour démarrer l'application:
+```sh
+docker-compose up
+```
+
+
 CI/CD:
-Ajout dans docker-compose.yml du container frontent(app/) qui permet d'ajouter la partie frontend lors du deploiement
+Ajout dans [docker-compose.yml](docker-compose.yml) du container frontent(app/) qui permet d'ajouter la partie frontend lors du deploiement
 
 Gestion multi-onglet/multi-browsers de la selection des fusées via socket.io
 

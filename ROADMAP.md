@@ -2,6 +2,7 @@
 
 ## UI/UX:
 - Afficher les caractéristiques techniques de chaque fusée lors du survol
+- Ajouter le son pour les flammes de la rocket
 
 ## Features:
 - Pouvoir parier sur une des 2 fusées choisies, ajouter une étape entre la sélection et le lancement des fusées

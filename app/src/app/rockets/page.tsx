@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
+import RocketLaunch from '@/components/RocketLaunch';
+import styles from './page.module.css';
 
 export default function RocketsPage() {
   const router = useRouter();
@@ -32,6 +34,13 @@ export default function RocketsPage() {
     };
   }
 
+  interface RocketInfo {
+    id: string;
+    name: string;
+    description: string;
+    image: string;
+  }
+
   const [startRace, { data: raceData, loading: raceLoading, error: raceError }] = useMutation<RaceData>(START_RACE_MUTATION);
 
   // Create a more robust method to get subscription variables
@@ -46,6 +55,23 @@ export default function RocketsPage() {
       return { 
         raceId: String(raceData.startRace.id),
         rocketId: String(raceData.startRace.rocket1.id)
+      };
+    }
+    return null;
+  }, [raceData?.startRace]);
+
+  // Create a more robust method to get subscription variables
+  const getSubscriptionRocket2 = useCallback(() => {
+    // Ensure both raceId and rocketId are non-null and non-empty
+    if (
+      raceData?.startRace?.id && 
+      raceData.startRace.rocket2?.id
+    ) {
+      console.log("racID ", raceData.startRace.id)
+      console.log("rocketId ", raceData.startRace.rocket2.id)
+      return { 
+        raceId: String(raceData.startRace.id),
+        rocketId: String(raceData.startRace.rocket2.id)
       };
     }
     return null;
@@ -66,12 +92,12 @@ export default function RocketsPage() {
 
   // Update subscription readiness when race data is available
   useEffect(() => {
-    if (raceData?.startRace?.id && raceData.startRace.rocket1?.id) {
+    if (raceData?.startRace?.id && raceData.startRace.rocket1?.id && raceData.startRace.rocket2?.id) {
       setIsSubscriptionReady(true);
     }
   }, [raceData]);
 
-  // Subscription for rocket progress
+  // Subscription for rocket1 progress
   const { data: progressData, error: progressError } = useSubscription(
     ROCKET_PROGRESS_SUBSCRIPTION, 
     { 
@@ -85,9 +111,25 @@ export default function RocketsPage() {
       }
     }
   );
+
+    // Subscription for rocket1 progress
+    const { data: progressData2, error: progressError2 } = useSubscription(
+      ROCKET_PROGRESS_SUBSCRIPTION, 
+      { 
+        variables: getSubscriptionRocket2() || {},
+        skip: !isSubscriptionReady, // More explicit skip condition
+        onComplete: () => {
+          console.log('Rocket Progress Subscription Completed');
+        },
+        onData: ({ }) => {
+          console.log('Subscription Data Received in OnData:');
+        }
+      }
+    );
+
   // Update debug info when progress data changes
   useEffect(() => {
-    if (progressData?.rocketProgress) {
+    if (progressData?.rocketProgress && progressData2?.rocketProgress) {
       console.log('Rocket Progress Update:', progressData.rocketProgress);
       
       // Restructure the progress data to match previous format
@@ -99,15 +141,15 @@ export default function RocketsPage() {
           exploded: progressData.rocketProgress.exploded
         },
         rocket2: {
-          id: progressData.rocketProgress.rocketId,
-          progress: progressData.rocketProgress.progress,
-          exploded: progressData.rocketProgress.exploded
+          id: progressData2.rocketProgress.rocketId,
+          progress: progressData2.rocketProgress.progress,
+          exploded: progressData2.rocketProgress.exploded
         }
       };
-
+      console.log('Rocket Progress Debug Data:', rocketProgressDebugData);
       setRaceProgressDebug(rocketProgressDebugData);
     }
-  }, [progressData]);
+  }, [progressData, progressData2]);
 
   // Comprehensive error handling
   useEffect(() => {
@@ -206,171 +248,170 @@ export default function RocketsPage() {
     }
   };
 
+ // Filter only the selected rockets
+ const selectedRocketsTab = data?.rockets?.filter((rocket: any) => 
+  selectedRockets.includes(rocket.id)
+) || [];  
+console.log("selectedRocketsTab", selectedRocketsTab)
+
   if (loading) return <p>Loading rockets...</p>;
   if (error) return <p>Error loading rockets: {error.message}</p>;
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Rockets</h1>
-      <div className="grid grid-cols-5 gap-3">
-        {data.rockets.map((rocket: any) => (
-          <div 
-            key={rocket.id} 
-            onClick={() => handleRocketSelect(rocket.id)}
-            className={`border p-2 rounded-lg shadow-md flex flex-col items-center 
-                       transition-all duration-300 ease-in-out 
-                       hover:scale-105 hover:shadow-xl 
-                       hover:border-blue-500 
-                       cursor-pointer 
-                       transform active:scale-95
-                       hover:bg-blue-50 
-                       active:bg-blue-100
-                       hover:text-black
-                       ${selectedRockets.includes(rocket.id) ? 'ring-2 ring-blue-500 bg-blue-100 text-black' : ''}`}
-          >
-            {rocket.image && (
-              <div className="mb-2 w-full h-40 relative overflow-hidden rounded-lg">
-                <Image 
-                  src={rocket.image} 
-                  alt={rocket.name} 
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
-                  className="object-contain"
-                />
+      {!raceLaunchedBy && (
+        <div>
+          <h1 className="text-2xl text-center font-bold mb-4">Select the 2 Rockets for the Race</h1>
+          <div className="grid grid-cols-5 gap-3">
+            {data.rockets.map((rocket: any) => (
+              <div 
+                key={rocket.id} 
+                onClick={() => handleRocketSelect(rocket.id)}
+                className={`border p-2 rounded-lg shadow-md flex flex-col items-center 
+                          transition-all duration-300 ease-in-out 
+                          hover:scale-105 hover:shadow-xl 
+                          hover:border-blue-500 
+                          cursor-pointer 
+                          transform active:scale-95
+                          hover:bg-blue-50 
+                          active:bg-blue-100
+                          hover:text-black
+                          ${selectedRockets.includes(rocket.id) ? 'ring-2 ring-blue-500 bg-blue-100 text-black' : ''}`}
+              >
+                {rocket.image && (
+                  <div className="mb-2 w-full h-40 relative overflow-hidden rounded-lg">
+                    <Image 
+                      src={rocket.image} 
+                      alt={rocket.name} 
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      className="object-contain"
+                    />
+                  </div>
+                )}
+                <h2 className="text-sm font-semibold mb-1">{rocket.name}</h2>
+                <p className="text-xs text-center line-clamp-2">{rocket.description}</p>
               </div>
-            )}
-            <h2 className="text-sm font-semibold mb-1">{rocket.name}</h2>
-            <p className="text-xs text-center line-clamp-2">{rocket.description}</p>
-            {selectedRockets.includes(rocket.id) && (
-              <div className="mt-1 text-xs text-blue-600">
-                Selected (Player: {selectedRockets.indexOf(rocket.id) + 1})
-              </div>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
-      
-      <div className="flex justify-center mt-6 relative">
-        <div 
-          className="group"
-          data-tooltip="Choose two rockets before take off"
-        >
-          <button 
-            onClick={handleLaunchRace}
-            disabled={selectedRockets.length !== 2}
-            className={`
-              flex items-center
-              font-bold 
-              py-3 px-6 
-              rounded-full 
-              shadow-lg 
-              transform 
-              transition-all 
-              duration-300 
-              focus:outline-none 
-              focus:ring-2 
-              focus:ring-opacity-50
-              ${selectedRockets.length === 2 
-                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 active:scale-95 hover:shadow-xl focus:ring-blue-500' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'}
-            `}
-          >
-            <span className="flex items-center">
-              🚀 Launch the Race 🏁
-            </span>
-          </button>
-          {selectedRockets.length !== 2 && (
+          
+          <div className="flex justify-center mt-6 relative">
             <div 
-              className="
-                absolute 
-                top-full 
-                left-1/2 
-                transform 
-                -translate-x-1/2 
-                mt-2 
-                bg-black 
-                text-white 
-                text-xs 
-                px-3 
-                py-2 
-                rounded-lg 
-                opacity-0 
-                group-hover:opacity-100 
-                transition-opacity 
-                duration-300 
-                z-10
-              "
+              className="group"
+              data-tooltip="Choose two rockets before take off"
             >
-              Choose two rockets before take off
+              <button 
+                onClick={handleLaunchRace}
+                disabled={selectedRockets.length !== 2}
+                className={`
+                  flex items-center
+                  font-bold 
+                  py-3 px-6 
+                  rounded-full 
+                  shadow-lg 
+                  transform 
+                  transition-all 
+                  duration-300 
+                  focus:outline-none 
+                  focus:ring-2 
+                  focus:ring-opacity-50
+                  ${selectedRockets.length === 2 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 active:scale-95 hover:shadow-xl focus:ring-blue-500' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'}
+                `}
+              >
+                <span className="flex items-center">
+                  🚀 Launch the Race 🏁
+                </span>
+              </button>
+              {selectedRockets.length !== 2 && (
+                <div 
+                  className="
+                    absolute 
+                    top-full 
+                    left-1/2 
+                    transform 
+                    -translate-x-1/2 
+                    mt-2 
+                    bg-black 
+                    text-white 
+                    text-xs 
+                    px-3 
+                    py-2 
+                    rounded-lg 
+                    opacity-0 
+                    group-hover:opacity-100 
+                    transition-opacity 
+                    duration-300 
+                    z-10
+                  "
+                >
+                  Choose two rockets before take off
+                </div>
+              )}
             </div>
-          )}
-
-          {/* Race Launched Debug Text */}
-          {raceLaunchedBy && (
-            <div className="text-center mt-4 p-2 bg-yellow-100 text-yellow-800 rounded-lg">
-              🏁 Race Launched! 
-              <br />
-              Initiated by Socket ID: {raceLaunchedBy.slice(0, 8)}...
-            </div>
-          )}
-
-          <div 
-            className="
-              absolute 
-              top-full 
-              left-1/2 
-              transform 
-              -translate-x-1/2 
-              mt-2 
-              bg-black 
-              text-white 
-              text-xs 
-              px-3 
-              py-2 
-              rounded-lg 
-              opacity-0 
-              group-hover:opacity-100 
-              transition-opacity 
-              duration-300 
-              z-10
-            "
-          >
-            Race launched by {raceLaunchedBy}
           </div>
+        </div>
+      )}
+      {raceLaunchedBy && (
+      <div>
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-4">Debug Info</h2>
+          <div className="max-w-8xl">
 
-          {/* Debug Section for Race Launch */}
-          {raceData?.startRace && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg text-yellow-800">
-              <h3 className="font-bold mb-2">Race Launch Debug</h3>
-              <div>
-                <p>Race ID: {raceData.startRace.id}</p>
-                <p>Rocket 1 ID: {raceData.startRace.rocket1.id}</p>
-                <p>Rocket 2 ID: {raceData.startRace.rocket2.id}</p>
+            {/* Debug Section for Race Launch */}
+            {raceData?.startRace && selectedRocketsTab && raceProgressDebug && (
+              <div className="flex mt-4 p-4 bg-blue-50 rounded-lg text-yellow-800">
+                  {selectedRocketsTab.map((rocket: any) => (
+                    <RocketLaunch key={rocket.id} rocketInfo={rocket} raceProgressDebug={raceProgressDebug}/>
+                  ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Debug Section for Rocket Progress */}
-          {raceProgressDebug && (
-            <div className="mt-4 p-4 bg-green-50 rounded-lg">
-              <h3 className="font-bold mb-2">Rocket Progress Debug</h3>
-              <div>
-                <p>Race ID: {raceProgressDebug.raceId}</p>
+            {/* Race Launched Debug Text */}
+            {raceLaunchedBy && (
+              <div className="text-center mt-4 p-2 bg-yellow-100 text-yellow-800 rounded-lg">
+                🏁 Race Launched! 
+                <br />
+                Initiated by Socket ID: {raceLaunchedBy.slice(0, 8)}...
+              </div>
+            )}
+
+            {/* Debug Section for Race Launch */}
+            {raceData?.startRace && selectedRocketsTab && (
+              <div className="flex mt-4 p-4 bg-blue-50 rounded-lg text-yellow-800">
+                <h3 className="font-bold mb-2">Race Launch Debug</h3>
                 <div>
-                  <h4>Rocket 1</h4>
-                  <p>Progress: {raceProgressDebug.rocket1.progress.toFixed(2)}%</p>
-                  <p>Exploded: {raceProgressDebug.rocket1.exploded ? 'Yes' : 'No'}</p>
-                </div>
-                <div>
-                  <h4>Rocket 2</h4>
-                  <p>Progress: {raceProgressDebug.rocket2.progress.toFixed(2)}%</p>
-                  <p>Exploded: {raceProgressDebug.rocket2.exploded ? 'Yes' : 'No'}</p>
+                  <p>Race ID: {raceData.startRace.id}</p>
+                  <p>Rocket 1 ID: {raceData.startRace.rocket1.id}</p>
+                  <p>Rocket 2 ID: {raceData.startRace.rocket2.id}</p>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Debug Section for Rocket Progress */}
+            {raceProgressDebug && (
+              <div className="mt-4 p-4 bg-green-50 rounded-lg text-yellow-800">
+                <h3 className="font-bold mb-2">Rocket Progress Debug</h3>
+                <div>
+                  <p>Race ID: {raceProgressDebug.raceId}</p>
+                  <div>
+                    <h4>Rocket {raceProgressDebug.rocket1.id}</h4>
+                    <p>Progress: {raceProgressDebug.rocket1.progress.toFixed(2)}%</p>
+                    <p>Exploded: {raceProgressDebug.rocket1.exploded ? 'Yes' : 'No'}</p>
+                  </div>
+                  <div>
+                    <h4>Rocket {raceProgressDebug.rocket2.id}</h4>
+                    <p>Progress: {raceProgressDebug.rocket2.progress.toFixed(2)}%</p>
+                    <p>Exploded: {raceProgressDebug.rocket2.exploded ? 'Yes' : 'No'}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

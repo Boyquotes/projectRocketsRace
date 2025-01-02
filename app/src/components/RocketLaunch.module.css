@@ -1,0 +1,177 @@
+.scene {
+  height: 800px;
+  width: 800px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+  background-image: url('/space-background-univers.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.scene.launch {
+  animation: scrollBackground 20s linear forwards;
+}
+
+.rocket {
+  position: relative;
+  width: 60px;
+  height: 120px;
+}
+
+.rocket_body {
+  width: 60px;
+  height: 80px;
+  background: #f2f2f2;
+  border-radius: 50% 50% 0 0;
+  position: relative;
+}
+
+.rocket_image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Only apply shake animation when parent has launch class */
+.launch .rocket_image {
+  animation: shake 0.5s infinite alternate;
+}
+
+.exhaust_flame {
+  position: absolute;
+  bottom: 20px;
+  left: 27px;
+  width: 11px;
+  height: 15px;
+  background: linear-gradient(to bottom,
+    #ff0000 0%,   /* red at top */
+    #ff4d00 50%,  /* bright orange at middle */
+    #ffd700 100%  /* yellow in bottom */
+  );
+  border-radius: 0 0 50% 50%;
+  animation: flame 0.5s infinite;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.launch .exhaust_flame {
+  opacity: 1;
+  visibility: visible;
+}
+
+@keyframes flame {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(0) translateX(-5px);
+  }
+  50% {
+
+    transform: translateY(0) translateX(5px);
+  }
+  75% {
+    transform: translateY(0) translateX(-5px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+    
+}
+
+@keyframes shake {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(0) translateX(-2px);
+  }
+  50% {
+    transform: translateY(0) translateX(2px);
+  }
+  75% {
+    transform: translateY(0) translateX(-2px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+} 
+
+@keyframes scrollBackground {
+  from {
+    background-position: center bottom;
+  }
+  to {
+    background-position: center top;
+  }
+} 
+
+.playButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 20px;
+  background-color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.playButton:hover {
+  background-color: #ddd;
+} 
+
+.audioControls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.playButton, .stopButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.playButton {
+  background-color: #fff;
+}
+
+.stopButton {
+  background-color: #ff4444;
+  color: white;
+}
+
+.playButton:hover {
+  background-color: #ddd;
+}
+
+.stopButton:hover {
+  background-color: #ff2222;
+}
+
+.playButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.explosionButton {
+  background-color: #ffbb33;
+  color: white;
+}
+
+.explosionButton:hover {
+  background-color: #ffaa00;
+} 
