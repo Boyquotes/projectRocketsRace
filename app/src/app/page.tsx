@@ -207,10 +207,11 @@ export default function Home() {
     <div className="container mx-auto p-4 font-[family-name:var(--font-geist-sans)]">
       <main>
         { command === 'retry' && <div className="text-2xl text-center font-bold mb-4">Take your revenge, another race?</div> }
+        {/* Display Rockets selection and bouton launch */}
         {!raceLaunchedBy || command == 'retry' ? (
             <div>
               <h1 className="text-2xl text-center font-bold mb-4">Select the 2 Rockets for the Race</h1>
-              <div className="grid grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
                 {data.rockets.map((rocket: any) => (
                   <div 
                     key={rocket.id} 

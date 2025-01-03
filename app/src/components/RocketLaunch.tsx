@@ -30,7 +30,6 @@ export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLau
         });
       }
     }, 2500);
-
     return () => clearTimeout(timer);
   }, []);
 

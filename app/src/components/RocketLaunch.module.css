@@ -113,12 +113,6 @@
   z-index: 10;
 }
 
-.nameButton {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-}
-
 .explosionButton {
   background-color: #ffbb33;
   color: white;
@@ -147,6 +141,19 @@
   font-size: 3em;
   font-weight: bold;
   color: rgb(186, 169, 169);
+}
+
+/* Small devices (sm: max-width: 640px) */
+@media (max-width: 640px) {
+  .progression{
+    color: #FFF;
+    font-size: 18px;
+  }
+  .nameButton {
+    top: 5px;
+    left: 5px;
+    padding: 5px 10px;
+  }
 }
 
 @keyframes explode {
