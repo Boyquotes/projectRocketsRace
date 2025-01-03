@@ -18,6 +18,10 @@ Gestion multi-onglet/multi-browsers de la selection des fusées via socket.io
 
 Pistes d'amélioration: [ROADMAP](ROADMAP.md)
 
+![MENU](menu.png)
+![GAME](game.png)
+![GAME OVER](victoryExploded.png)
+
 ------
 
 # Challenge de développement - Course de fusées 🚀
