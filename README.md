@@ -5,6 +5,11 @@ Pour démarrer l'application:
 docker-compose up
 ```
 
+L'application sera disponible en local sur le port 3000
+http://localhost:3000
+
+- [Vidéo de la course avec explosion](rocketsRaceExploded.mp4)
+- [Vidéo de la course avec le premier a 100%](rocketsRace100.mp4)
 
 CI/CD:
 Ajout dans [docker-compose.yml](docker-compose.yml) du container frontent(app/) qui permet d'ajouter la partie frontend lors du deploiement
