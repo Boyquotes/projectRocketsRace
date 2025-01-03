@@ -3,12 +3,14 @@
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import useStore from '@/store/useStore';
 import { RocketLaunchProps } from '@/types/rocket';
 import RocketAudio from './RocketAudio';
 import styles from './RocketLaunch.module.css';
 
 export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLaunchProps) {
   const router = useRouter();
+  const { command, setCommand } = useStore(); // Access Zustand store
   const [launch, setLaunch] = useState(false);
   const [destroy, setDestroy] = useState(false);
   const [showExplosion, setShowExplosion] = useState(false);
@@ -16,7 +18,7 @@ export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLau
   const audioRef = useRef<HTMLAudioElement>(new Audio());
   const explosionAudioRef = useRef<HTMLAudioElement>(new Audio());
   const winnerAudioRef = useRef<HTMLAudioElement>(new Audio());
-  
+
   useEffect(() => {
     // Start launch automatically after a delay
     const timer = setTimeout(() => {
@@ -27,7 +29,7 @@ export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLau
           console.log('Autoplay prevented by browser');
         });
       }
-    }, 100);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -63,9 +65,8 @@ export default function RocketLaunch({ rocketInfo, raceProgressDebug}: RocketLau
     // Hide explosion after animation
     const timer = setTimeout(() => {
       setShowWinner(false);
-      console.log("RETRY")
-      setLaunch(false);
-    }, 7000);
+      setCommand("retry"); // Update command in Zustand store
+    }, 5000);
     return () => clearTimeout(timer);
   }
 
